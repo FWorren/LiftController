@@ -1,5 +1,20 @@
 package types
 
+import (
+	"net"
+)
+
+const N_FLOORS = 4
+const N_BUTTONS = 3
+
+type Elev_button_type_t int
+
+const (
+	BUTTON_CALL_UP Elev_button_type_t = iota
+	BUTTON_CALL_DOWN
+	BUTTON_COMMAND
+)
+
 type Client struct {
 	Floor         int
 	Direction     int
@@ -40,7 +55,6 @@ const (
 	WAIT
 	STOPS
 	STOP_OBS
-	UNDEF
 )
 
 type Event_t int

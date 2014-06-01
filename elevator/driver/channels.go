@@ -52,5 +52,3 @@ const FLOOR_DOWN1 = -1
 const FLOOR_UP4 = -1
 const LIGHT_DOWN1 = -1
 const LIGHT_UP4 = -1
-const N_FLOORS = 4
-const N_BUTTONS = 3

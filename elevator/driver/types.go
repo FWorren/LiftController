@@ -1,13 +1,5 @@
 package driver
 
-type Elev_button_type_t int
-
-const (
-	BUTTON_CALL_UP Elev_button_type_t = iota
-	BUTTON_CALL_DOWN
-	BUTTON_COMMAND
-)
-
 var lamp_channel_matrix = [N_FLOORS][N_BUTTONS]int{
 	{LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
 	{LIGHT_UP2, LIGHT_DOWN2, LIGHT_COMMAND2},
