@@ -1,28 +1,29 @@
 package main
 
 import (
+	types "./types"
 	network "./network"
 	controller "./controller"
 )
 
 func main() {
 	all_ips_m := make(map[string]time.Time)
-	all_clients_m := make(map[string]Client)
+	all_clients_m := make(map[string]types.Client)
 
-	msg_from_network := make(chan Client, 1)
-	order_to_network := make(chan Client, 1)
-	order_from_network := make(chan Client, 3)
-	order_from_cost := make(chan Client, 3)
-	status_update_c := make(chan Client, 1)
-	check_backup_c := make(chan Client, 1)
-	lost_orders_c := make(chan Client, 1)
-	send_lights_c := make(chan Lights, 1)
-	set_light_c := make(chan Lights, 1)
-	send_del_req_c := make(chan Order, 1)
-	del_order_c := make(chan Order, 1)
-	order_complete_c := make(chan Order, 1)
+	msg_from_network := make(chan types.Client, 1)
+	order_to_network := make(chan types.Client, 1)
+	order_from_network := make(chan types.Client, 3)
+	order_from_cost := make(chan types.Client, 3)
+	status_update_c := make(chan types.Client, 1)
+	check_backup_c := make(chan types.Client, 1)
+	lost_orders_c := make(chan types.Client, 1)
+	send_lights_c := make(chan types.Lights, 1)
+	set_light_c := make(chan types.Lights, 1)
+	send_del_req_c := make(chan types.Order, 1)
+	del_order_c := make(chan types.Order, 1)
+	order_complete_c := make(chan types.Order, 1)
 	disconnected := make(chan int, 1)
-	netstate_c := make(chan NetState_t, 1)
+	netstate_c := make(chan types.NetState_t, 1)
 
 	localIP, _ := LocalIP()
 	fmt.Println(localIP)
