@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"../types"
 	"math"
 )
 

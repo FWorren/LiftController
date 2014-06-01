@@ -29,41 +29,31 @@ func Search_for_orders(order_internal chan Order, reset_list_c chan Order, reset
 		for {
 			time.Sleep(10 * time.Millisecond)
 			for i := 0; i < N_FLOORS; i++ {
-				if driver.Elev_get_button_signal(BUTTON_COMMAND, i) == 1 {
-					if !list[BUTTON_COMMAND][i] {
-						new_order.Button = BUTTON_COMMAND
-						new_order.Floor = i
-						list[BUTTON_COMMAND][i] = true
-						Elev_set_button_lamp(BUTTON_COMMAND, i, 1)
-						order_internal <- new_order
-					}
+				if driver.Elev_get_button_signal(BUTTON_COMMAND, i) == 1 && !list[BUTTON_COMMAND][i] {
+					new_order.Button = BUTTON_COMMAND
+					new_order.Floor = i
+					list[BUTTON_COMMAND][i] = true
+					Elev_set_button_lamp(BUTTON_COMMAND, i, 1)
+					order_internal <- new_order
 				}
-				if i > 0 {
-					if driver.Elev_get_button_signal(BUTTON_CALL_DOWN, i) == 1 {
-						if !list[BUTTON_CALL_DOWN][i] {
-							new_order.Floor = i
-							new_order.Button = BUTTON_CALL_DOWN
-							list[BUTTON_CALL_DOWN][i] = true
-							order_internal <- new_order
-						}
-					}
+				if i > 0 && !list[BUTTON_CALL_DOWN][i] && driver.Elev_get_button_signal(BUTTON_CALL_DOWN, i) == 1 {
+					new_order.Floor = i
+					new_order.Button = BUTTON_CALL_DOWN
+					list[BUTTON_CALL_DOWN][i] = true
+					order_internal <- new_order
 				}
-				if i < N_FLOORS-1 {
-					if driver.Elev_get_button_signal(BUTTON_CALL_UP, i) == 1 {
-						if !list[BUTTON_CALL_UP][i] {
-							new_order.Floor = i
-							new_order.Button = BUTTON_CALL_UP
-							list[BUTTON_CALL_UP][i] = true
-							order_internal <- new_order
-						}
-					}
+				if i < N_FLOORS-1 && !list[BUTTON_CALL_UP][i] && driver.Elev_get_button_signal(BUTTON_CALL_UP, i) == 1 {
+					new_order.Floor = i
+					new_order.Button = BUTTON_CALL_UP
+					list[BUTTON_CALL_UP][i] = true
+					order_internal <- new_order
 				}
 			}
 		}
 	}()
 }
 
-func Get_backup_orders(client Client) [3][4]bool {
+func Get_backup_orders(client Client) [N_BUTTONS][N_FLOORS]bool {
 	var command_list [N_BUTTONS][N_FLOORS]bool
 	for i := 0; i < N_FLOORS; i++ {
 		if client.Order_list[BUTTON_COMMAND][i] {
@@ -74,7 +64,7 @@ func Get_backup_orders(client Client) [3][4]bool {
 	return command_list
 }
 
-func Check_number_of_local_orders(local_list [3][4]bool) bool {
+func Check_number_of_local_orders(local_list [N_BUTTONS][N_FLOORS]bool) bool {
 	numb_orders := 0
 	for i := 0; i < N_FLOORS; i++ {
 		if local_list[BUTTON_CALL_UP][i] {
@@ -94,7 +84,7 @@ func Check_number_of_local_orders(local_list [3][4]bool) bool {
 	}
 }
 
-func Set_head_order(local_list [3][4]bool, Head_order Order, Prev_order Order) Order {
+func Set_head_order(local_list [N_BUTTONS][N_FLOORS]bool, Head_order Order, Prev_order Order) Order {
 	switch Prev_order.Dir {
 	case 1:
 		new_head := OrderHandler_state_up(local_list, Head_order, Prev_order)
@@ -113,7 +103,7 @@ func Set_head_order(local_list [3][4]bool, Head_order Order, Prev_order Order) O
 	}
 }
 
-func State_up(local_list [3][4]bool, Head_order Order, Prev_order Order) Order {
+func State_up(local_list [N_BUTTONS][N_FLOORS]bool, Head_order Order, Prev_order Order) Order {
 	if Prev_order.Floor == N_FLOORS-1 {
 		Head_order.Dir = -1
 		Head_order.Floor = -1
@@ -144,7 +134,7 @@ func State_up(local_list [3][4]bool, Head_order Order, Prev_order Order) Order {
 	return Head_order
 }
 
-func State_down(local_list [3][4]bool, Head_order Order, Prev_order Order) Order {
+func State_down(local_list [N_BUTTONS][N_FLOORS]bool, Head_order Order, Prev_order Order) Order {
 	if Prev_order.Floor == 0 {
 		Head_order.Dir = 1
 		Head_order.Floor = -1
@@ -175,7 +165,7 @@ func State_down(local_list [3][4]bool, Head_order Order, Prev_order Order) Order
 	return Head_order
 }
 
-func Delete_all_orders(local_list *[3][4]bool) {
+func Delete_all_orders(local_list *[N_BUTTONS][N_FLOORS]bool) {
 	for i := 0; i < N_FLOORS; i++ {
 		local_list[BUTTON_CALL_DOWN][i] = false
 		local_list[BUTTON_CALL_UP][i] = false

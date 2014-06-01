@@ -58,7 +58,7 @@ func ControlHandler(order_from_network chan Client, order_to_network chan Client
 			light.Flag = true
 			send_lights_c <- light
 		case backup_client := <-check_backup_c:
-			client.Order_list = get_backup_orders(backup_client)
+			client.Order_list = Get_backup_orders(backup_client)
 			local_list = client.Order_list
 		case state = <-state_c:
 			client.State = state
@@ -81,12 +81,12 @@ func ControlHandler(order_from_network chan Client, order_to_network chan Client
 		case netState = <-netstate_c:
 			client.NetState = netState
 		case <-disconnected:
-			OrderHandler_delete_all_orders(&local_list);
+			Delete_all_orders(&local_list);
 			reset_all_c <- 1
 		case <-timeOut:
 			has_order := Check_number_of_local_orders(local_list)
 			if (state == WAIT || state == UNDEF) && has_order {
-				Head_order = OrderHandler_set_head_order(local_list, Head_order, Prev_order)
+				Head_order = Set_head_order(local_list, Head_order, Prev_order)
 				client.Direction = Head_order.Dir
 				head_order_c <- Head_order
 			}

@@ -55,6 +55,7 @@ func ElevatorHandler(head_order_c chan Order, prev_order_c chan Order, del_order
 	}();
 
 	go func () {
+		var event Event_t
 		for {
 			time.Sleep(10 * time.Millisecond)
 			switch event {
