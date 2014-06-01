@@ -1,6 +1,8 @@
 package network
 
 import (
+	types "../types"
+	driver "../driver"
 	"fmt"
 	"net"
 	"os"
@@ -8,7 +10,7 @@ import (
 	"time"
 )
 
-func Restore_floorpanel_orders(ip net.IP) (bool, Client) {
+func Restore_floorpanel_orders(ip net.IP) (bool, types.Client) {
 	ip_last_digits := Get_last_ip_digits(ip)
 	file := "network/backup/data"
 	file += ip_last_digits
@@ -21,30 +23,30 @@ func Restore_floorpanel_orders(ip net.IP) (bool, Client) {
 	return false, backup_client
 }
 
-func Search_for_lost_orders(client Client, order_from_cost chan Client, all_clients map[string]Client) {
-	for i := 0; i < controller.N_FLOORS; i++ {
-		if client.Order_list[BUTTON_CALL_DOWN][i] {
+func Search_for_lost_orders(client types.Client, order_from_cost chan types.Client, all_clients map[string]types.Client) {
+	for i := 0; i < types.N_FLOORS; i++ {
+		if client.Order_list[types.BUTTON_CALL_DOWN][i] {
 			client.Floor = i
-			client.Button = BUTTON_CALL_DOWN
+			client.Button = types.BUTTON_CALL_DOWN
 			priorityHandler(client, order_from_cost, all_clients)
 		}
-		if client.Order_list[BUTTON_CALL_UP][i] {
+		if client.Order_list[types.BUTTON_CALL_UP][i] {
 			client.Floor = i
-			client.Button = BUTTON_CALL_UP
+			client.Button = types.BUTTON_CALL_UP
 			priorityHandler(client, order_from_cost, all_clients)
 		}
 	}
 }
 
-func Sync_lights(all_clients map[string]Client, localIP net.IP) {
+func Sync_lights(all_clients map[string]types.Client, localIP net.IP) {
 	for key, value := range all_clients {
 		if key != localIP.String() {
-			for i := 0; i < N_FLOORS; i++ {
-				if value.Order_list[BUTTON_CALL_UP][i] {
-					Elev_set_button_lamp(BUTTON_CALL_UP, i, 1)
+			for i := 0; i < types.N_FLOORS; i++ {
+				if value.Order_list[types.BUTTON_CALL_UP][i] {
+					// Sync lights in controller
 				}
-				if value.Order_list[BUTTON_CALL_DOWN][i] {
-					Elev_set_button_lamp(BUTTON_CALL_DOWN, i, 1)
+				if value.Order_list[types.BUTTON_CALL_DOWN][i] {
+					// Sync lights in controller
 				}
 			}
 			break
@@ -52,7 +54,7 @@ func Sync_lights(all_clients map[string]Client, localIP net.IP) {
 	}
 }
 
-func Check_connectivity(disconnected chan int, netstate_c chan NetState_t, all_clients map[string]Client, localIP net.IP) {
+func Check_connectivity(disconnected chan int, netstate_c chan types.NetState_t, all_clients map[string]types.Client, localIP net.IP) {
 	connected := make(chan bool)
 	sync := false
 
@@ -90,7 +92,7 @@ func Get_kill_sig() {
 	signal.Notify(sigchan, os.Interrupt)
 	<-sigchan
 	fmt.Println("Program killed !")
-	Elev_set_speed(0)
+	driver.Elev_set_speed(0)
 	os.Exit(0)
 }
 

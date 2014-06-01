@@ -1,12 +1,13 @@
 package controller
 
 import (
+	types "../types" 
 	driver "../driver"
 	"fmt"
 	"time"
 )
 
-func Elevator_init() (init_elevator bool, init_hardware bool, prev driver.Order) {
+func Elevator_init() (init_elevator bool, init_hardware bool, prev types.Order) {
 	init_hardware = true
 	if Elev_init() == 0 {
 		init_hardware = false
@@ -15,12 +16,12 @@ func Elevator_init() (init_elevator bool, init_hardware bool, prev driver.Order)
 	fmt.Println("Press STOP button to stop elevator and exit program.\n")
 	Elevator_clear_all_lights()
 	Elev_set_speed(-300)
-	var current Order
+	var current types.Order
 	for {
 		time.Sleep(10 * time.Millisecond)
-		floor := Elev_get_floor_sensor_signal()
+		floor := driver.Elev_get_floor_sensor_signal()
 		if floor != -1 {
-			Elev_set_floor_indicator(floor)
+			driver.Elev_set_floor_indicator(floor)
 			Elevator_break(-1)
 			init_elevator = true
 			current.Floor = floor
@@ -30,13 +31,13 @@ func Elevator_init() (init_elevator bool, init_hardware bool, prev driver.Order)
 	return init_elevator, init_hardware, current_floor
 }
 
-func ElevatorHandler(head_order_c chan Order, prev_order_c chan Order, del_order chan Order, state_c chan State_t, update_local_list_c chan[N_BUTTONS][N_FLOORS]bool) {
-	get_prev_floor_c := make(chan Order, 1)
-	delete_order_c := make(chan Order, 1)
-	state_c := make(chan State_t, 1)
-	update_local_list := make(chan [N_BUTTONS][N_FLOORS]bool)
-	var head_order Order
-	var prev_order Order
+func ElevatorHandler(head_order_c chan types.Order, prev_order_c chan types.Order, del_order chan types.Order, state_c chan types.State_t, update_local_list_c chan[types.N_BUTTONS][types.N_FLOORS]bool) {
+	get_prev_floor_c := make(chan types.Order, 1)
+	delete_order_c := make(chan types.Order, 1)
+	state_c := make(chan types.State_t, 1)
+	update_local_list := make(chan [types.N_BUTTONS][types.N_FLOORS]bool)
+	var head_order types.Order
+	var prev_order types.Order
 
 	go func () {
 		for {
@@ -57,17 +58,17 @@ func ElevatorHandler(head_order_c chan Order, prev_order_c chan Order, del_order
 		for {
 			time.Sleep(10 * time.Millisecond)
 			switch event {
-			case NEW_ORDER:
+			case types.NEW_ORDER:
 				event = Elevator_run()
-			case NO_ORDER:
+			case types.NO_ORDER:
 				event = Elevator_wait()
-			case FLOOR_REACHED:
+			case types.FLOOR_REACHED:
 				event = Elevator_door()
-			case OBSTRUCTION:
+			case types.OBSTRUCTION:
 				event = Elevator_stop_obstruction()
-			case STOP:
+			case types.STOP:
 				event = Elevator_stop()
-			case UNDEF:
+			case types.UNDEF:
 				event = Elevator_undef()
 			}
 		}
@@ -79,27 +80,27 @@ func Elvator_wait() {
 }
 
 func Elevator_run() {
-	Elev_set_speed(300 * head_order.Dir)
-	current_floor := Elev_get_floor_sensor_signal()
+	driver.Elev_set_speed(300 * head_order.Dir)
+	current_floor := driver.Elev_get_floor_sensor_signal()
 	if current_floor != -1 {
-		var current Order
+		var current types.Order
 		current.Floor = current_floor
 		current.Dir = head_order.Dir
 		get_prev_floor_c <- current
-		Elev_set_floor_indicator(current_floor)
+		driver.Elev_set_floor_indicator(current_floor)
 	}
 	if current_floor == head_order.Floor {
 		Elevator_break(head_order.Dir)
 		floor_reached <- head_order
-		return FLOOR_REACHED
+		return types.FLOOR_REACHED
 	}
 	if Elev_get_stop_signal() {
 		Elevator_break(head_order.Dir)
-		return STOP
+		return types.STOP
 	}
 	if Elev_get_obstruction_signal() {
 		Elevator_break(head_order.Dir)
-		return OBSTRUCTION
+		return types.OBSTRUCTION
 	}
 }
 

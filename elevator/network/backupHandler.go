@@ -1,6 +1,7 @@
 package network
 
 import (
+	types "../types"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +11,7 @@ import (
 	"strings"
 )
 
-func Write_to_file(client Client) {
+func Write_to_file(client types.Client) {
 	client_encoded, err_encoding := json.Marshal(client)
 	if err_encoding != nil {
 		fmt.Println("error encoding json: ", err_encoding)
@@ -32,8 +33,8 @@ func Write_to_file(client Client) {
 	}
 }
 
-func Read_file(file string) (bool, Client) {
-	var decoded_client Client
+func Read_file(file string) (bool, types.Client) {
+	var decoded_client types.Client
 	file_opened, err := os.Open(file)
 	if err != nil {
 		fmt.Println("No file to read from, creating file..")
@@ -53,7 +54,7 @@ func Read_file(file string) (bool, Client) {
 	return false, decoded_client
 }
 
-func Restore_command_orders(check_backup_c chan Client, localIP net.IP) bool {
+func Restore_command_orders(check_backup_c chan types.Client, localIP net.IP) bool {
 	ip_last_digits := Get_last_ip_digits(localIP)
 	file := "network/backup/data"
 	file += ip_last_digits

@@ -1,28 +1,28 @@
 package controller
 
 import (
+	types "../types"
 	driver "../driver"
 	"net"
 	"time"
 )
 
-func ControlHandler(order_from_network chan Client, order_to_network chan Client, check_backup_c chan Client, status_update_c chan Client, send_lights_c chan Lights, send_del_req_c chan Order, order_complete_c chan Order, disconnected chan int, netstate_c chan NetState_t, current_floor Order, localIP net.IP) {
-	order_internal := make(chan Order, 1)
-	head_order_c := make(chan Order, 1)
-	prev_order_c := make(chan Order, 1)
-	del_Order := make(chan Order, 1)
-	reset_list_c := make(chan Order, 1)
-	state_c := make(chan State_t, 1)
+func ControlHandler(order_from_network chan types.Client, order_to_network chan types.Client, check_backup_c chan types.Client, status_update_c chan types.Client, send_lights_c chan types.Lights, send_del_req_c chan types.Order, order_complete_c chan types.Order, disconnected chan int, netstate_c chan types.NetState_t, current_floor types.Order, localIP net.IP) {
+	order_internal := make(chan types.Order, 1)
+	head_order_c := make(chan types.Order, 1)
+	prev_order_c := make(chan types.Order, 1)
+	del_Order := make(chan types.Order, 1)
+	reset_list_c := make(chan types.Order, 1)
+	state_c := make(chan types.State_t, 1)
 	reset_all_c := make(chan int, 1)
-	convenient_list_c := make(chan [3][4]bool, 1)
+	convenient_list_c := make(chan [types.N_BUTTONS][types.N_FLOORS]bool, 1)
 
-	var state State_t
-	var netState NetState_t
-	var local_list [3][4]bool
-	var client Client
-	var Head_order Order
-	var light Lights
-	state = UNDEF
+	var state types.State_t
+	var netState types.NetState_t
+	var local_list [types.N_BUTTONS][types.N_FLOORS]bool
+	var client types.Client
+	var Head_order types.Order
+	var light types.Lights
 	Prev_order := current_floor
 	client.Current_floor = current_floor.Floor
 	client.Direction = current_floor.Dir
@@ -39,9 +39,9 @@ func ControlHandler(order_from_network chan Client, order_to_network chan Client
 			client.Button = to_network.Button
 			client.Ip = localIP
 			client.Current_floor = Prev_order.Floor
-			if to_network.Button == BUTTON_COMMAND && !local_list[BUTTON_COMMAND][to_network.Floor] {
-				local_list[BUTTON_COMMAND][to_network.Floor] = true
-				client.Order_list[BUTTON_COMMAND][to_network.Floor] = true
+			if to_network.Button == types.BUTTON_COMMAND && !local_list[types.BUTTON_COMMAND][to_network.Floor] {
+				local_list[types.BUTTON_COMMAND][to_network.Floor] = true
+				client.Order_list[types.BUTTON_COMMAND][to_network.Floor] = true
 			} else {
 				if netState == ON {
 					order_to_network <- client

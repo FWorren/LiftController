@@ -1,12 +1,13 @@
 package network
 
 import (
+	types "../types"
 	"fmt"
 	"net"
 	"sort"
 )
 
-func priorityHandler(external driver.Client, order_from_cost chan driver.Client, all_clients map[string]driver.Client) {
+func priorityHandler(external types.Client, order_from_cost chan types.Client, all_clients map[string]types.Client) {
 	for key, value := range all_clients {
 		value.Cost = priorityHandler_getCost(value, external)
 		all_clients[key] = value
@@ -23,29 +24,29 @@ func priorityHandler(external driver.Client, order_from_cost chan driver.Client,
 	order_from_cost <- designated_client
 }
 
-func priorityHandler_getCost(client driver.Client, external driver.Client) int {
+func priorityHandler_getCost(client types.Client, external types.Client) int {
 	cost := 0
-	if client.State == driver.STOPS || client.State == driver.STOP_OBS {
+	if client.State == types.STOPS || client.State == types.STOP_OBS {
 		cost += 20
 	}
 	diff := external.Floor - client.Current_floor
 	cost = abs(diff)
 
-	for i := 0; i < driver.N_FLOORS; i++ {
-		if client.Order_list[driver.BUTTON_COMMAND][i] {
+	for i := 0; i < types.N_FLOORS; i++ {
+		if client.Order_list[types.BUTTON_COMMAND][i] {
 			cost += 2
 		}
-		if client.Order_list[driver.BUTTON_CALL_DOWN][i] {
+		if client.Order_list[types.BUTTON_CALL_DOWN][i] {
 			cost += 2
 		}
-		if client.Order_list[driver.BUTTON_CALL_UP][i] {
+		if client.Order_list[types.BUTTON_CALL_UP][i] {
 			cost += 2
 		}
 	}
 	return cost
 }
 
-func priorityHandler_sort_all_ips(all_clients map[string]driver.Client) net.IP {
+func priorityHandler_sort_all_ips(all_clients map[string]types.Client) net.IP {
 	cost_m := make(map[string]int)
 	var designated_ip net.IP
 	var cost []int
