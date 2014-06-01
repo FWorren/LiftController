@@ -78,13 +78,15 @@ func Check_connectivity(disconnected chan int, netstate_c chan NetState_t, all_c
 		}
 	}()
 
-	for {
-		time.Sleep(200 * time.Millisecond)
-		_, err := net.LookupHost("google.com")
-		if err == nil {
-			connected <- true
+	go func () {
+		for {
+			time.Sleep(200 * time.Millisecond)
+			_, err := net.LookupHost("google.com")
+			if err == nil {
+				connected <- true
+			}
 		}
-	}
+	}();
 }
 
 func Get_kill_sig() {

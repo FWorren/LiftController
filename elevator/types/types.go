@@ -61,7 +61,7 @@ type Event_t int
 
 const (
 	NEW_ORDER Event_t = iota
-	NO_ORDER
+	NO_ORDERS
 	FLOOR_REACHED
 	OBSTRUCTION
 	STOP
