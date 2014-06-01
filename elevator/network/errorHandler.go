@@ -1,7 +1,6 @@
 package network
 
 import (
-	driver "../driver"
 	"fmt"
 	"net"
 	"os"

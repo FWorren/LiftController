@@ -1,7 +1,6 @@
 package network
 
 import (
-	driver "../driver"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

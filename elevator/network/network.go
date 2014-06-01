@@ -1,7 +1,6 @@
 package network
 
 import (
-	controller "../controller"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -21,9 +20,9 @@ func Inter_process_communication(msg_from_network chan driver.Client, order_from
 			Search_for_lost_orders(lost_orders, order_from_cost, all_clients)
 		case set_light := <-set_light_c:
 			if set_light.Flag {
-				driver.Elev_set_button_lamp(set_light.Button, set_light.Floor, 1)
+				//Send ligth request to controller
 			} else {
-				driver.Elev_set_button_lamp(set_light.Button, set_light.Floor, 0)
+				//Send ligth request to controller
 			}
 		case delete_order := <-del_order_c:
 			network_list[delete_order.Button][delete_order.Floor] = false

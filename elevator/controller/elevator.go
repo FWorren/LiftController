@@ -6,39 +6,31 @@ import (
 	"time"
 )
 
-func Initialize_elevator() (init_elevator bool, init_hardware bool, prev driver.Order) {
+func Elevator_init() (init_elevator bool, init_hardware bool, prev driver.Order) {
 	init_hardware = true
 	if Elev_init() == 0 {
 		init_hardware = false
 		fmt.Println("Unable to initialize elevator hardware\n")
 	}
 	fmt.Println("Press STOP button to stop elevator and exit program.\n")
-	init_elevator, current_floor := driver.Elevator_init()
-	if !init_elevator {
-		fmt.Println("Unable to initialize elevator to floor\n")
-	}
-	return init_elevator, init_hardware, current_floor
-}
-
-func Elevator_init() (init bool, prev Order) {
 	Elevator_clear_all_lights()
 	Elev_set_speed(-300)
+	var current Order
 	for {
 		time.Sleep(10 * time.Millisecond)
 		floor := Elev_get_floor_sensor_signal()
 		if floor != -1 {
 			Elev_set_floor_indicator(floor)
 			Elevator_break(-1)
-			set := true
-			var current Order
+			init_elevator = true
 			current.Floor = floor
 			current.Dir = -1
-			return set, current
 		}
 	}
+	return init_elevator, init_hardware, current_floor
 }
 
-func Elevator_eventhandler(head_order_c chan Order, prev_order_c chan Order, del_order chan Order, state_c chan State_t, update_local_list_c chan[N_BUTTONS][N_FLOORS]bool) {
+func ElevatorHandler(head_order_c chan Order, prev_order_c chan Order, del_order chan Order, state_c chan State_t, update_local_list_c chan[N_BUTTONS][N_FLOORS]bool) {
 	get_prev_floor_c := make(chan Order, 1)
 	delete_order_c := make(chan Order, 1)
 	state_c := make(chan State_t, 1)

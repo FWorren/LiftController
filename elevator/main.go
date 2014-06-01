@@ -2,6 +2,7 @@ package main
 
 import (
 	network "./network"
+	controller "./controller"
 )
 
 func main() {
@@ -26,9 +27,9 @@ func main() {
 	localIP, _ := LocalIP()
 	fmt.Println(localIP)
 
-	init_elevator, init_hardware, current_floor := driver.Initialize_elevator()
+	init_elevator, init_hardware, current_floor := controller.Elevator_init()
 	if init_elevator && init_hardware {
-		go driver.OrderHandler_process_orders(order_from_network, order_to_network, check_backup_c, status_update_c, send_lights_c, send_del_req_c, order_complete_c, disconnected, netstate_c, current_floor, localIP)
+		go controller.ControlHandler(order_from_network, order_to_network, check_backup_c, status_update_c, send_lights_c, send_del_req_c, order_complete_c, disconnected, netstate_c, current_floor, localIP)
 	}
 
 	restore_ok := Restore_command_orders(check_backup_c, localIP)
