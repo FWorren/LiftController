@@ -41,8 +41,8 @@ func ElevatorHandler(head_order_c chan Order, prev_order_c chan Order, del_order
 	go func () {
 		for {
 			select {
-			case update_local_list =<- :
-			case head_order =<-head_order_c:
+			case update_local_list = <- update_local_list_c:
+			case head_order = <-head_order_c:
 			case prev_order = <-get_prev_floor_c:
 				prev_order_c <- prev_order
 			case del_req := <-delete_order:

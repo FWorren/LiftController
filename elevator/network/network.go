@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func Inter_process_communication(msg_from_network chan driver.Client, order_from_network chan driver.Client, order_from_cost chan driver.Client, lost_orders_c chan driver.Client, set_light_c chan driver.Lights, del_order_c chan driver.Order, localIP net.IP, all_clients map[string]driver.Client, order_complete_c chan driver.Order) {
+func Inter_process_communication(msg_from_network chan Client, order_from_network chan Client, order_from_cost chan Client, lost_orders_c chan Client, set_light_c chan Lights, del_order_c chan Order, localIP net.IP, all_clients map[string]Client, order_complete_c chan Order) {
 	for {
 		select {
 		case new_order := <-msg_from_network:
 			all_clients[new_order.Ip.String()] = new_order
-			if new_order.Button != driver.BUTTON_COMMAND {
+			if new_order.Button != BUTTON_COMMAND {
 				network_list[new_order.Button][new_order.Floor] = true
 				priorityHandler(new_order, order_from_cost, all_clients)
 			}
@@ -36,14 +36,14 @@ func Inter_process_communication(msg_from_network chan driver.Client, order_from
 	}
 }
 
-func Read_msg(msg_from_network chan driver.Client, set_light_c chan driver.Lights, del_order_c chan driver.Order, localIP net.IP, all_clients map[string]driver.Client) {
+func Read_msg(msg_from_network chan Client, set_light_c chan Lights, del_order_c chan Order, localIP net.IP, all_clients map[string]Client) {
 	laddr, err_conv_ip_listen := net.ResolveUDPAddr("udp", ":20003")
 	Check_error(err_conv_ip_listen)
 	listener, err_listen := net.ListenUDP("udp", laddr)
 	Check_error(err_listen)
-	var decoded_client driver.Client
-	var decoded_lights driver.Lights
-	var decoded_order driver.Order
+	var decoded_client Client
+	var decoded_lights Lights
+	var decoded_order Order
 	for {
 		b := make([]byte, 1024)
 		n, _, _ := listener.ReadFromUDP(b)
@@ -70,7 +70,7 @@ func Read_msg(msg_from_network chan driver.Client, set_light_c chan driver.Light
 	}
 }
 
-func Send_msg(order_to_network chan driver.Client, send_lights_c chan driver.Lights, send_del_req_c chan driver.Order) {
+func Send_msg(order_to_network chan Client, send_lights_c chan Lights, send_del_req_c chan Order) {
 	baddr, err_conv_ip := net.ResolveUDPAddr("udp", "129.241.187.255:20003")
 	Check_error(err_conv_ip)
 	msg_sender, err_dialudp := net.DialUDP("udp", nil, baddr)
@@ -102,7 +102,7 @@ func Send_msg(order_to_network chan driver.Client, send_lights_c chan driver.Lig
 	}
 }
 
-func Send_status(status_update_c chan driver.Client) {
+func Send_status(status_update_c chan Client) {
 	baddr, err_conv_ip := net.ResolveUDPAddr("udp", "129.241.187.255:20020")
 	Check_error(err_conv_ip)
 	status_sender, err_dialudp := net.DialUDP("udp", nil, baddr)
@@ -121,12 +121,12 @@ func Send_status(status_update_c chan driver.Client) {
 	}
 }
 
-func Read_status(lost_orders_c chan driver.Client, all_ips map[string]time.Time, all_clients map[string]driver.Client, localIP net.IP) {
+func Read_status(lost_orders_c chan Client, all_ips map[string]time.Time, all_clients map[string]Client, localIP net.IP) {
 	laddr, err_conv_ip_listen := net.ResolveUDPAddr("udp", ":20020")
 	Check_error(err_conv_ip_listen)
 	status_receiver, err_listen := net.ListenUDP("udp", laddr)
 	Check_error(err_listen)
-	var status_decoded driver.Client
+	var status_decoded Client
 	for {
 		time.Sleep(25 * time.Millisecond)
 		b := make([]byte, 1024)
@@ -153,8 +153,8 @@ func Read_status(lost_orders_c chan driver.Client, all_ips map[string]time.Time,
 	}
 }
 
-func CheckForElapsedClients(all_ips map[string]time.Time, all_clients map[string]driver.Client) (bool, driver.Client) {
-	var client driver.Client
+func CheckForElapsedClients(all_ips map[string]time.Time, all_clients map[string]Client) (bool, Client) {
+	var client Client
 	for key, value := range all_ips {
 		if time.Now().Sub(value) > 2*time.Second {
 			fmt.Println("Deleting IP: ", key, " ", value)
