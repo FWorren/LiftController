@@ -1,4 +1,4 @@
-package controller
+package types
 
 type Client struct {
 	Floor         int
