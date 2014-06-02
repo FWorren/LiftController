@@ -35,14 +35,14 @@ func ElevatorHandler(head_order_c chan Order, prev_order_c chan Order, del_order
 	get_prev_floor_c := make(chan Order, 1)
 	delete_order_c := make(chan Order, 1)
 	state_update_c := make(chan State_t, 1)
-	update_local_list := make(chan [N_BUTTONS][N_FLOORS]bool)
+	var local_list [N_BUTTONS][N_FLOORS]bool
 	var head_order Order
 	var prev_order Order
 
 	go func () {
 		for {
 			select {
-			case update_local_list = <- update_local_list_c:
+			case local_list = <- update_local_list_c:
 			case head_order = <-head_order_c:
 			case prev_order = <-get_prev_floor_c:
 				prev_order_c <- prev_order
