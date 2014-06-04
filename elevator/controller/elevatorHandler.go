@@ -173,12 +173,12 @@ func Elevator_clear_all_lights() {
 	driver.Elev_set_door_open_lamp(0)
 	driver.Elev_set_stop_lamp(0)
 	for i := 0; i < N_FLOORS; i++ {
-		Elev_set_button_lamp(BUTTON_COMMAND, i, 0)
+		driver.Elev_set_button_lamp(BUTTON_COMMAND, i, 0)
 		if i > 0 {
-			Elev_set_button_lamp(BUTTON_CALL_DOWN, i, 0)
+			driver.Elev_set_button_lamp(BUTTON_CALL_DOWN, i, 0)
 		}
 		if i < N_FLOORS-1 {
-			Elev_set_button_lamp(BUTTON_CALL_UP, i, 0)
+			driver.Elev_set_button_lamp(BUTTON_CALL_UP, i, 0)
 		}
 	}
 }
