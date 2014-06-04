@@ -55,6 +55,7 @@ const (
 	WAIT
 	STOPS
 	STOP_OBS
+	UNDEFS
 )
 
 type Event_t int
